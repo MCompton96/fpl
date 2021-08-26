@@ -5,6 +5,7 @@ import pandas as pd
 import json
 import os
 from setting import *
+import smtplib, ssl
 
 with open('data/transfers.json', 'r') as f:
     transfer_info = json.load(f)
@@ -15,6 +16,7 @@ with open('data/my_team_info.json', 'r') as f:
 bank = transfer_info['bank'] / 10
 budget = team_info['last_deadline_value'] / 10
 
+events = pd.read_csv('./data/events.csv')
 
 def get_cron_date(date):
 
@@ -26,9 +28,16 @@ def get_cron_date(date):
 
     return cron
 
+def get_gameweek():
+    gw = 0
+    for id in events.index:
+        if events["is_current"][id] == True:
+            gw = events["id"][id] 
+
+    return gw
+
 def get_deadline():
 
-    events = pd.read_csv('./data/events.csv')
     now = datetime.utcnow()
     for i in events.index:
         deadline_date = datetime.strptime(events['deadline_time'][i], '%Y-%m-%dT%H:%M:%SZ')
@@ -122,8 +131,23 @@ def html_response(transfers):
 
 def send_email(content):
 
-    sender_email = 
+    sender_email = EMAIL_SETTINGS["Sender"]
+    receiver_email =EMAIL_SETTINGS["Receiver"]
+    password = EMAIL_SETTINGS["password"]
+
+    message = MIMEMultipart('alternative')
+    message['Subject'] = f'Fantasy AI - Gameweek {get_gameweek()}'
+    message['From'] = sender_email
+    message['To'] = receiver_email
+
+    part = MIMEText(content, 'html')
+    message.attach(part)
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
+
+    
 
 
-
-print(os.environ)
