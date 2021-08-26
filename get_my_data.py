@@ -9,8 +9,13 @@ http = urllib3.PoolManager(
        cert_reqs='CERT_REQUIRED',
        ca_certs=certifi.where())
 
+user_id = FPL_SETTINGS['userId']
+password = FPL_SETTINGS['password']
+username = FPL_SETTINGS['username']
+
 base_url = 'https://fantasy.premierleague.com/api/'
-url = base_url + f'entry/{FPL_SETTINGS["userID"]}/history/'
+url = base_url + f'entry/{user_id}/history/'
+
 
 r = http.request('GET', url)
 data = json.loads(r.data.decode('utf-8'))
@@ -23,14 +28,14 @@ with open('data/my_gw_data.json', 'w', encoding='utf-8') as f:
 session = requests.session()
 url = 'https://users.premierleague.com/accounts/login/'
 payload = {
- 'password': FPL_SETTINGS["password"],
- 'login': FPL_SETTINGS["username"],
+ 'password': password,
+ 'login': username,
  'redirect_uri': 'https://fantasy.premierleague.com/a/login',
  'app': 'plfpl-web'
 }
 r = session.post(url, data=payload)
 
-response = session.get(f'https://fantasy.premierleague.com/api/my-team/{FPL_SETTINGS["userId"]}')
+response = session.get(f'https://fantasy.premierleague.com/api/my-team/{user_id}')
 r = response.json()
 squad = r['picks']
 with open('data/my_squad.json', 'w', encoding='utf-8') as f:
@@ -40,7 +45,7 @@ transfers = r['transfers']
 with open('data/transfers.json', 'w', encoding='utf-8') as f:
     json.dump(transfers, f, ensure_ascii=True, indent=2)
 
-url = base_url + f'entry/{FPL_SETTINGS["userId"]}/'
+url = base_url + f'entry/{user_id}/'
 
 r = http.request('GET', url)
 data = json.loads(r.data.decode('utf-8'))

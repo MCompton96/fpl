@@ -419,3 +419,9 @@ def get_transfers():
         
         return best_transfers
 
+transfers = get_transfers()
+
+with open('data/my_transfers.json', 'w', encoding='utf-8') as f:
+    json.dump(transfers, f, ensure_ascii=True, indent=2)
+
+

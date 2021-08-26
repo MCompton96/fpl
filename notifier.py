@@ -95,8 +95,6 @@ def html_response(transfers):
             <tr>
                 <td>{transfer['out']['name'].title()}<small>[£{transfer['out']['cost']}]</small></td>
                 <td>{transfer['in']['name'].title()}<small>[£{transfer['in']['cost']}]</small></td>
-                <td>{transfer['points']}</td>
-                <td>{transfer['g/l']}</td>
             </tr>
         '''
     
@@ -112,8 +110,6 @@ def html_response(transfers):
                 <tr>
                     <th>Out</th>
                     <th>In</th>
-                    <th>Points</th>
-                    <th>Gain/Loss</th>
                 </tr>
                 {html}
             </table>
@@ -149,5 +145,13 @@ def send_email(content):
         server.sendmail(sender_email, receiver_email, message.as_string())
 
     
+
+with open('data/my_transfers.json', 'r') as f:
+    transfers = json.load(f)
+
+res = html_response(transfers)
+send_email(res)
+
+
 
 
